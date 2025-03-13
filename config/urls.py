@@ -9,10 +9,11 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('', include('homepage.urls')),
     path('books/', include('books.urls')),
     path('pupils/', include('pupils.urls')),
-    path('', include('give_book.urls')),
     path('take_book/', include('take_book.urls')),
+    path('give_book/', include('give_book.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

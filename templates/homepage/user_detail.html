@@ -17,9 +17,11 @@
                         <label class="form-label">Last Name:</label>
                         <input type="text" class="form-control" value="{{ user.last_name }}" disabled>
                     </div>
-                    <div class="text-center mt-4">
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'home' %}" class="btn btn-secondary">Bekor qilish</a>
                         <a href="{% url 'change_password' %}" class="btn btn-primary">Change Password</a>
                     </div>
+
                 </div>
             </div>
         </div>
