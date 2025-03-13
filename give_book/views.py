@@ -3,7 +3,6 @@ from django.views.generic import ListView, DetailView
 from books.models import Book
 from pupils.models import Pupil
 from django.http import JsonResponse
-
 # Create your views here.
 class HomePageView(ListView):
     model = Book
@@ -19,5 +18,14 @@ def search_pupil(request, pk):
         book.save()
         pupil.save()
         return redirect('give_book')
+
+
+def check_pupil(request, pupil_id):
+    from django.http import JsonResponse
+    try:
+        pupil = Pupil.objects.get(id=pupil_id)
+        return JsonResponse({"exists": True, "first_name": pupil.first_name})
+    except Pupil.DoesNotExist:
+        return JsonResponse({"exists": False})
 
 
