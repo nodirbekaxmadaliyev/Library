@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+        <div class="row justify-content-center" >
+            <div class="col-md-6" style="width:800px;">
+                <div class="card shadow-lg p-4">
+    <h2 class="mb-4">Yangi kitob qo'shish</h2>
+    <div class="card">
+        <div class="card-body">
+            <form method="post" class="container mt-4">
+    {% csrf_token %}
+
+    <div class="d-grid gap-3">
+        <div>
+            <label for="id_book_code" class="form-label">Kitob kodi</label>
+            {{ form.book_code }}
+        </div>
+
+        <div>
+            <label for="id_name" class="form-label">Kitob nomi</label>
+            {{ form.name }}
+        </div>
+
+        <div>
+            <label for="id_authors" class="form-label">Muallif(lar)</label>
+            {{ form.authors }}
+        </div>
+
+        <div>
+            <label for="id_year" class="form-label">Chop etilgan yil</label>
+            {{ form.year }}
+        </div>
+
+        <div>
+            <label for="id_book_lang" class="form-label">Til</label>
+            {{ form.book_lang }}
+        </div>
+
+        <div>
+            <label for="id_number" class="form-label">Soni</label>
+            {{ form.number }}
+        </div>
+
+        <div>
+            <button type="submit" class="btn btn-primary">Saqlash</button>
+        </div>
+    </div>
+</form>
+
+        </div>
+    </div>
+    <a href="{% url 'books' %}" class="btn btn-secondary mt-3">Orqaga qaytish</a>
+</div>
+            </div></div></div>
+{% endblock content %}

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+        <div class="row justify-content-center" >
+            <div class="col-md-6" style="width:800px;">
+                <div class="card shadow-lg p-4">
+                    <h2 class="mb-4">Yangi talaba qo'shish</h2>
+    <div class="card">
+        <div class="card-body">
+            <form method="post" class="container mt-4">
+    {% csrf_token %}
+    <div class="d-grid gap-3">
+        <div>
+            <label for="id_first_name" class="form-label">Ismi</label>
+            {{ form.first_name }}
+        </div>
+
+        <div>
+            <label for="id_last_name" class="form-label">Familiyasi</label>
+            {{ form.last_name }}
+        </div>
+
+        <div>
+            <label for="id_group" class="form-label">Guruhi</label>
+            {{ form.group }}
+        </div>
+
+        <div>
+            <label for="id_course" class="form-label">Kursi</label>
+            {{ form.course }}
+        </div>
+
+        <div>
+            <button type="submit" class="btn btn-primary">Saqlash</button>
+        </div>
+    </div>
+</form>
+
+        </div>
+    </div>
+    <a href="{% url 'pupils' %}" class="btn btn-secondary mt-3">Orqaga qaytish</a>
+                </div>
+            </div>
+        </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<form id="search-form">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Ismi</th>
+                <th>Familiyasi</th>
+                <th>Guruhi</th>
+                <th>Kursi</th>
+                <th>Olgan kitoblari</th>
+            </tr>
+            <tr>
+                <td style="text-align: center;">{{ pupil.id }}</td>
+                <td>{{ pupil.first_name }}</td>
+                <td>{{ pupil.last_name }}</td>
+                <td>{{ pupil.group }}</td>
+                <td>{{ pupil.course }}</td>
+                <td>{{ pupil.books }}</td>
+            </tr>
+        </thead>
+    </table>
+</form>
+<div class="d-flex justify-content-center mt-4 gap-3">
+    <a href="{% url 'pupils' %}" class="btn btn-secondary">Ortga</a>
+
+    <a href="{% url 'pupil_update' pupil.pk %}" class="btn btn-warning">Tahrirlash</a>
+
+    <form action="{% url 'pupil_delete' pupil.pk %}" method="post" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger" onclick="return confirm('Talabani o\'chirishga ishonchingiz komilmi?')">O'chirish</button>
+    </form>
+</div>
+{% endblock content %}

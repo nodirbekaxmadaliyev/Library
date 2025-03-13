@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+        <div class="row justify-content-center" >
+            <div class="col-md-6" style="width:800px;">
+                <div class="card shadow-lg p-4">
+    <h2 class="text-center mb-4">Kitobni tahrirlash</h2>
+
+    <form method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+
+        <div class="row">
+            <!-- Chap ustun -->
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="id_book_code" class="form-label">Kitob kodi</label>
+                    {{ form.book_code }}
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_name" class="form-label">Kitob nomi</label>
+                    {{ form.name }}
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_authors" class="form-label">Muallif(lar)</label>
+                    {{ form.authors }}
+                </div>
+            </div>
+
+            <!-- O'ng ustun -->
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="id_year" class="form-label">Chop etilgan yil</label>
+                    {{ form.year }}
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_book_lang" class="form-label">Kitob tili</label>
+                    {{ form.book_lang }}
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_number" class="form-label">Kitob soni</label>
+                    {{ form.number }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Tugmalar -->
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <button type="submit" class="btn btn-primary">Saqlash</button>
+            <a href="{% url 'book_detail' book.pk %}" class="btn btn-secondary">Bekor qilish</a>
+        </div>
+    </form>
+</div>
+            </div></div></div>
+
+
+{% endblock content %}

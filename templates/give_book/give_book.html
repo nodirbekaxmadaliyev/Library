@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<form>
+    <table class="table">
+        <thead>
+            <tr>
+                <th style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 10;">Book Code</th>
+                <th style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 10;">Name</th>
+                <th style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 10;">Author</th>
+                <th style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 10;">Year</th>
+                <th style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 10;">Language</th>
+                <th style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 10;">Number</th>
+            </tr>
+            <tr>
+                <td style="text-align: center;">{{ book.book_code }}</td>
+                <td>{{ book.name }}</td>
+                <td>{{ book.authors }}</td>
+                <td>{{ book.year }}</td>
+                <td>{{ book.book_lang }}</td>
+                <td>{{ book.number }}</td>
+            </tr>
+        </thead>
+    </table>
+</form>
+<div class="container mt-5" style="text-align: center;">
+{% if book.number > 0 %}
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal" style="width: 250px; height: 50px;">
+            Kitobni berish
+</button>
+{% else %}
+    <h2>Kitob soni yetarli emas</h2>
+{% endif %}
+</div>
+
+<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+ <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="searchModalLabel">Talaba Qidirish</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="searchForm">
+                    <div class="mb-3 d-flex">
+                        <label for="studentId" class="form-label me-2">ID:</label>
+                        <input type="number" id="studentId" class="form-control me-2" placeholder="Talaba ID">
+                        <button type="button" id = "search_pupil" class="btn btn-success" onclick="searchStudent()">Qidirish</button>
+                    </div>
+                </form>
+                <div id="result" class="mt-3"></div>
+            </div>
+            <button type="submit" class="btn btn-primary" id = "kitobni-berish" style="width: 200px; height: 50px; margin: 0px auto 15px;" disabled>Kitobni berish</button>
+        </div>
+ </div>
+</div>
+
+<script>
+    document.getElementById("kitobni-berish").addEventListener("click", function()
+    {
+    const studentId = document.getElementById("studentId").value;
+    const bookId = "{{ book.name }}";
+    if (studentId && bookId) {
+        fetch("{% url 'kitob_berish' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}",
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: new URLSearchParams({
+                    "studentId": studentId,
+                    "bookId": bookId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+
+                setTimeout(function() {
+                    window.location.href = "{% url 'give_book' book.pk %}";
+                }, 1000);
+            } else {
+                alert("Xatolik: " + data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Xatolik:", error);
+        });
+    } else {
+        alert("Talaba ID kiritilishi kerak!");
+    }
+});
+</script>
+
+
+
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+        <div class="row justify-content-center" >
+            <div class="col-md-6" style="width:800px;">
+                <div class="card shadow-lg p-4">
+    <h2 class="text-center mb-4">Talaba ma'lumotlarini tahrirlash</h2>
+
+    <form method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+        <div class="row">
+            <!-- Chap ustun -->
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="id_first_name" class="form-label">Ismi</label>
+                    {{ form.first_name }}
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_last_name" class="form-label">Familiya</label>
+                    {{ form.last_name }}
+                </div>
+            </div>
+
+            <!-- O'ng ustun -->
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="id_group" class="form-label">Guruhi</label>
+                    {{ form.group }}
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_course" class="form-label">Kursi</label>
+                    {{ form.course }}
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Tugmalar -->
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <button type="submit" class="btn btn-primary">Saqlash</button>
+            <a href="{% url 'pupil_detail' pupil.pk %}" class="btn btn-secondary">Bekor qilish</a>
+        </div>
+    </form>
+</div>
+            </div></div></div>
+
+
+{% endblock content %}

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<form id="search-form">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Book Code</th>
+                <th>Name</th>
+                <th>Author</th>
+                <th>Year</th>
+                <th>Language</th>
+                <th>Number</th>
+            </tr>
+            <tr>
+                <td style="text-align: center;">{{ book.book_code }}</td>
+                <td>{{ book.name }}</td>
+                <td>{{ book.authors }}</td>
+                <td>{{ book.year }}</td>
+                <td>{{ book.book_lang }}</td>
+                <td>{{ book.number }}</td>
+            </tr>
+        </thead>
+    </table>
+</form>
+<div class="d-flex justify-content-center mt-4 gap-3">
+    <a href="{% url 'books' %}" class="btn btn-secondary">Ortga</a>
+
+    <a href="{% url 'book_update' book.pk %}" class="btn btn-warning">Tahrirlash</a>
+
+    <form action="{% url 'book_delete' book.pk %}" method="post" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger" onclick="return confirm('Kitobni o\'chirishga ishonchingiz komilmi?')">O'chirish</button>
+    </form>
+</div>
+
+{% endblock content %}
