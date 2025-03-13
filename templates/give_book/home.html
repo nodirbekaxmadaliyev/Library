@@ -24,46 +24,47 @@
                 <td></td>
             </tr>
             {% for book in object_list %}
-            <tr>
-                <td style="text-align: center;">{{ book.book_code }}</td>
-                <td><strong>{{ book.name }}</strong></td>
-                <td>{{ book.authors }}</td>
-                <td>{{ book.year }}</td>
-                <td>{{ book.book_lang }}</td>
-                <td>{{ book.number }}</td>
-                <td>
-                    <button id = "give_button" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#pupilModal{{ book.pk }}" style="width: 200px;"
-                    {% if book.number == 0 %}disabled{% endif %}>
-                        Topshirish
-                    </button>
-                </td>
-            </tr>
+<tr>
+    <td style="text-align: center;">{{ book.book_code }}</td>
+    <td><strong>{{ book.name }}</strong></td>
+    <td>{{ book.authors }}</td>
+    <td>{{ book.year }}</td>
+    <td>{{ book.book_lang }}</td>
+    <td>{{ book.number }}</td>
+    <td>
+        <button id="give_button" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#pupilModal{{ book.pk }}" style="width: 200px;"
+            {% if book.number == 0 %}disabled{% endif %}>
+            Topshirish
+        </button>
+    </td>
+</tr>
 
 <!-- Modal har bir kitob uchun -->
-   <div class="modal fade" id="pupilModal{{ book.pk }}" tabindex="-1" aria-labelledby="pupilModalLabel{{ book.pk }}" aria-hidden="true">
-
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="pupilModalLabel{{ book.pk }}"><strong>{{ book.name }}</strong></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form method="post" action="{% url 'search_pupil' book.pk %}">
-                        {% csrf_token %}
-                           <div class="form-check" style="margin-bottom: 15px;">
-                               <label for="pupil_id" class="form-label me-2">ID:</label>
-                               <input class="form-control me-2" type="number" name="pupil_id" id="pupil_id" placeholder="Talaba ID" value="{{ pupil }}">
-                            </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor qilish</button>
-                            <button type="submit" class="btn btn-success" onclick="alert('Kitob topshirildi!')">Tasdiqlash</button>
-                        </div>
-                    </form>
-                </div>
+<div class="modal fade" id="pupilModal{{ book.pk }}" tabindex="-1" aria-labelledby="pupilModalLabel{{ book.pk }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="pupilModalLabel{{ book.pk }}"><strong>{{ book.name }}</strong></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'search_pupil' book.pk %}">
+                    {% csrf_token %}
+                    <div class="form-check" style="margin-bottom: 15px;">
+                        <label for="pupil_id_{{ book.pk }}" class="form-label me-2">ID:</label>
+                        <input class="form-control me-2" type="number" name="pupil_id" id="pupil_id_{{ book.pk }}" placeholder="Talaba ID">
+                        <button type="button" class="btn btn-info mt-2" onclick="checkPupil({{ book.pk }})">Tekshirish</button>
+                    </div>
+                    <div id="pupilInfo_{{ book.pk }}" style="margin-bottom: 15px;"></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                        <button type="submit" id="confirmButton_{{ book.pk }}" class="btn btn-success" disabled onclick="alert('Kitob topshirildi!')">Tasdiqlash</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+</div>
 
 
             {% endfor %}
@@ -71,4 +72,39 @@
 
     </table>
 </form>
+
+<script>
+    function checkPupil(bookId)
+    {
+        const pupilId = document.getElementById("pupil_id_" + bookId).value;
+        const pupilInfo = document.getElementById("pupilInfo_" + bookId);
+        const confirmButton = document.getElementById("confirmButton_" + bookId);
+
+        if (pupilId)
+        {
+            fetch(`/api/check_pupil/${pupilId}/`)  // API endpoint
+                .then(response => response.json())
+                .then(data =>
+                {
+                    if (data.exists)
+                    {
+                        pupilInfo.innerHTML = `<strong>Talaba ismi: ${data.first_name}</strong>`;
+                        confirmButton.disabled = false;
+                    } else
+                    {
+                        pupilInfo.innerHTML = `<span class="text-danger">Talaba topilmadi.</span>`;
+                        confirmButton.disabled = true;
+                    }
+                })
+                .catch(error => {
+                    pupilInfo.innerHTML = `<span class="text-danger">Xatolik yuz berdi.</span>`;
+                    confirmButton.disabled = true;
+                });
+        } else {
+            pupilInfo.innerHTML = "";
+            confirmButton.disabled = true;
+        }
+    }
+</script>
+
 {% endblock content %}
