@@ -24,7 +24,7 @@ def check_pupil(request, pupil_id):
     from django.http import JsonResponse
     try:
         pupil = Pupil.objects.get(id=pupil_id)
-        return JsonResponse({"exists": True, "first_name": pupil.first_name})
+        return JsonResponse({"exists": True, "first_name": f"{pupil.last_name} {pupil.first_name}"})
     except Pupil.DoesNotExist:
         return JsonResponse({"exists": False})
 

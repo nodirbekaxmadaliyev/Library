@@ -1,11 +1,43 @@
+from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView, FormView
 from .models import Book
-from .forms import BookForm
+from .forms import BookForm, ExcelUploadForm
+import pandas as pd
 
-class BooksListView(ListView):
+class BooksListView(ListView, FormView):
     model = Book
     template_name = 'book/books.html'
+    context_object_name = "Books"
+    form_class = ExcelUploadForm  # Fayl yuklash formasi
+    success_url = reverse_lazy('home')  # Fayl yuklanganidan keyin qaytish yo‘li
+
+    def form_valid(self, form):
+        message = None
+        try:
+            excel_file = self.request.FILES["excel_file"]
+            df = pd.read_excel(excel_file)
+
+            for _, row in df.iterrows():
+                Book.objects.create(
+                    book_code=row['Kodi'],
+                    name=row['Nomi'],
+                    authors=row['Yozuvchilari'],
+                    year=row['Yili'],
+                    book_lang=row['Tili'],
+                    number=row['Soni']
+                )
+
+            message = "Fayl muvaffaqiyatli yuklandi!"
+        except:
+            message = "Xatolik yuz berdi. Excel faylni tekshirib ko`ring."
+
+        return render(self.request, self.template_name, {
+            "form": form,
+            "Books": Book.objects.all(),
+            "message": message
+        })
+
 
 class BookCreateView(CreateView):
     model = Book

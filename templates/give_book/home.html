@@ -73,38 +73,5 @@
     </table>
 </form>
 
-<script>
-    function checkPupil(bookId)
-    {
-        const pupilId = document.getElementById("pupil_id_" + bookId).value;
-        const pupilInfo = document.getElementById("pupilInfo_" + bookId);
-        const confirmButton = document.getElementById("confirmButton_" + bookId);
-
-        if (pupilId)
-        {
-            fetch(`/api/check_pupil/${pupilId}/`)  // API endpoint
-                .then(response => response.json())
-                .then(data =>
-                {
-                    if (data.exists)
-                    {
-                        pupilInfo.innerHTML = `<strong>Talaba ismi: ${data.first_name}</strong>`;
-                        confirmButton.disabled = false;
-                    } else
-                    {
-                        pupilInfo.innerHTML = `<span class="text-danger">Talaba topilmadi.</span>`;
-                        confirmButton.disabled = true;
-                    }
-                })
-                .catch(error => {
-                    pupilInfo.innerHTML = `<span class="text-danger">Xatolik yuz berdi.</span>`;
-                    confirmButton.disabled = true;
-                });
-        } else {
-            pupilInfo.innerHTML = "";
-            confirmButton.disabled = true;
-        }
-    }
-</script>
 
 {% endblock content %}

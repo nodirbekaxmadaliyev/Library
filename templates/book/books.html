@@ -4,6 +4,9 @@
     <div class="d-flex justify-content-between align-items-center">
         <h1 class="text-center flex-grow-1">Barcha kitoblar</h1>
         <a href="{% url 'book_add' %}" class="btn btn-success">Qo'shish</a>
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#uploadModal" style="margin-left: 15px;">
+            <i class="fas fa-file-excel"></i> Yuklab olish
+        </button>
     </div>
 </div>
 
@@ -11,12 +14,12 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Book Code</th>
-                <th>Name</th>
-                <th>Author</th>
-                <th>Year</th>
-                <th>Language</th>
-                <th>Number</th>
+                <th>Kitob kodi</th>
+                <th>Nomi</th>
+                <th>Yozuvchilari</th>
+                <th>Yili</th>
+                <th>Tili</th>
+                <th>Soni</th>
             </tr>
             <tr>
                 <td><input type="text" name="code" class="form-control" placeholder="Code" ></td>
@@ -40,5 +43,42 @@
 
     </table>
 </form>
+
+
+<!-- Modal Exceldan yuklash uchun -->
+<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="uploadModalLabel">Excel Fayl Yuklash</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="excelFile" class="form-label">Fayl tanlang</label>
+                        <input type="file" class="form-control" name="excel_file" id="excelFile" accept=".xlsx, .xls">
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-success">Yuklash</button>
+                    </div>
+                </form>
+
+                {% if message %}
+                    <script>
+                        alert("{{ message }}");
+                        window.location.href = "{% url 'books' %}";
+                    </script>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock content %}
