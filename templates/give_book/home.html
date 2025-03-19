@@ -6,13 +6,13 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Book Code</th>
-                <th>Name</th>
-                <th>Author</th>
-                <th>Year</th>
-                <th>Language</th>
-                <th>Number</th>
-                <td>Topshirish</td>
+                <th>Kitob kodi</th>
+                <th>Nomi</th>
+                <th>Yozuvchilari</th>
+                <th>Yili</th>
+                <th>Tili</th>
+                <th>Soni</th>
+                <td style="width: 216px;">Topshirish</td>
             </tr>
             <tr>
                 <td><input type="text" name="code" class="form-control search-input" placeholder="Code" ></td>
@@ -70,7 +70,7 @@
 
             {% empty %}
                 <tr>
-                    <td colspan="6" class="text-center">Hech qanday natija topilmadi</td>
+                    <td colspan="7" class="text-center">Hech qanday natija topilmadi</td>
                 </tr>
             {% endfor %}
         </tbody>
