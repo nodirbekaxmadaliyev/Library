@@ -9,6 +9,7 @@
         </button>
     </div>
 </div>
+
 <form id="search-form">
     <table class="table">
         <thead>
@@ -21,13 +22,15 @@
                 <th style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 10;">Olgan kitoblari</th>
             </tr>
             <tr>
-                <td><input type="text" name="id" class="form-control" placeholder="Id" ></td>
-                <td><input type="text" name="first_name" class="form-control" placeholder="Ismi" ></td>
-                <td><input type="text" name="last_name" class="form-control" placeholder="Familiyasi" ></td>
-                <td><input type="text" name="group" class="form-control" placeholder="Guruhi" ></td>
-                <td><input type="text" name="course" class="form-control" placeholder="Kursi" ></td>
-                <td><input type="text" name="books" class="form-control" placeholder="Olgan kitoblari" ></td>
+                <td><input type="text" name="id" class="form-control search-input" placeholder="Id"></td>
+                <td><input type="text" name="first_name" class="form-control search-input" placeholder="Ismi"></td>
+                <td><input type="text" name="last_name" class="form-control search-input" placeholder="Familiyasi"></td>
+                <td><input type="text" name="group" class="form-control search-input" placeholder="Guruhi"></td>
+                <td><input type="text" name="course" class="form-control search-input" placeholder="Kursi"></td>
+                <td><input type="text" name="books" class="form-control search-input" placeholder="Olgan kitoblari"></td>
             </tr>
+        </thead>
+        <tbody>
             {% for pupil in object_list %}
             <tr>
                 <td style="text-align: center;"><a href="{% url 'pupil_detail' pupil.pk %}">{{ pupil.id }}</a></td>
@@ -37,9 +40,12 @@
                 <td>{{ pupil.course }}</td>
                 <td>{{ pupil.books }}</td>
             </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">Hech qanday natija topilmadi</td>
+                </tr>
             {% endfor %}
-        </thead>
-
+        </tbody>
     </table>
 </form>
 
@@ -79,5 +85,26 @@
     </div>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $(".search-input").on("keyup", function() {
+        let formData = $("#search-form").serialize(); // Inputdagi barcha qiymatlarni olish
+
+        $.ajax({
+            url: "{% url 'pupils' %}", // URL to'g'riligini tekshiring!
+            type: "GET",
+            data: formData,
+            success: function(data) {
+                $("tbody").html($(data).find("tbody").html()); // Jadvalni yangilash
+            },
+            error: function(xhr, status, error) {
+                console.log("Xatolik:", error); // Xatolikni brauzer konsolida ko'rsatish
+            }
+        });
+    });
+});
+
+</script>
 
 {% endblock content %}
