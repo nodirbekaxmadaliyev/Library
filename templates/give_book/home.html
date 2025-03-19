@@ -15,14 +15,16 @@
                 <td>Topshirish</td>
             </tr>
             <tr>
-                <td><input type="text" name="code" class="form-control" placeholder="Code" ></td>
-                <td><input  type="text" name="name" class="form-control" placeholder="Name" ></td>
-                <td><input type="text" name="author" class="form-control" placeholder="Author" ></td>
-                <td><input type="text" name="year" class="form-control" placeholder="Year" ></td>
-                <td><input type="text" name="language" class="form-control" placeholder="Language" ></td>
-                <td><input type="text" name="number" class="form-control" placeholder="Number" ></td>
+                <td><input type="text" name="code" class="form-control search-input" placeholder="Code" ></td>
+                <td><input  type="text" name="name" class="form-control search-input" placeholder="Name" ></td>
+                <td><input type="text" name="author" class="form-control search-input" placeholder="Author" ></td>
+                <td><input type="text" name="year" class="form-control search-input" placeholder="Year" ></td>
+                <td><input type="text" name="language" class="form-control search-input" placeholder="Language" ></td>
+                <td><input type="text" name="number" class="form-control search-input" placeholder="Number" ></td>
                 <td></td>
             </tr>
+        </thead>
+        <tbody>
             {% for book in object_list %}
 <tr>
     <td style="text-align: center;">{{ book.book_code }}</td>
@@ -66,12 +68,68 @@
     </div>
 </div>
 
-
+            {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">Hech qanday natija topilmadi</td>
+                </tr>
             {% endfor %}
-        </thead>
-
+        </tbody>
     </table>
 </form>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $(".search-input").on("keyup", function() {
+        let formData = $("#search-form").serialize(); // Inputdagi barcha qiymatlarni olish
+
+        $.ajax({
+            url: "{% url 'give_book' %}", // URL to'g'riligini tekshiring!
+            type: "GET",
+            data: formData,
+            success: function(data) {
+                $("tbody").html($(data).find("tbody").html()); // Jadvalni yangilash
+            },
+            error: function(xhr, status, error) {
+                console.log("Xatolik:", error); // Xatolikni brauzer konsolida ko'rsatish
+            }
+        });
+    });
+});
+
+   // Talaba qidirish
+function checkPupil(bookId)
+    {
+        const pupilId = document.getElementById("pupil_id_" + bookId).value;
+        const pupilInfo = document.getElementById("pupilInfo_" + bookId);
+        const confirmButton = document.getElementById("confirmButton_" + bookId);
+
+        if (pupilId)
+        {
+            fetch(`/api/check_pupil/${pupilId}/`)  // API endpoint
+                .then(response => response.json())
+                .then(data =>
+                {
+                    if (data.exists)
+                    {
+                        pupilInfo.innerHTML = `<strong>Talaba: ${data.first_name}</strong>`;
+                        confirmButton.disabled = false;
+                    } else
+                    {
+                        pupilInfo.innerHTML = `<span class="text-danger">Talaba topilmadi.</span>`;
+                        confirmButton.disabled = true;
+                    }
+                })
+                .catch(error => {
+                    pupilInfo.innerHTML = `<span class="text-danger">Xatolik yuz berdi.</span>`;
+                    confirmButton.disabled = true;
+                });
+        } else {
+            pupilInfo.innerHTML = "";
+            confirmButton.disabled = true;
+        }
+    }
+
+</script>
 
 {% endblock content %}

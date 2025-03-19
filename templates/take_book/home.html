@@ -20,70 +20,93 @@
                 <th style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 10;">Qabul qilish</th>
             </tr>
             <tr>
-                <td><input type="text" name="id" class="form-control" placeholder="Id" ></td>
-                <td><input type="text" name="first_name" class="form-control" placeholder="Ismi" ></td>
-                <td><input type="text" name="last_name" class="form-control" placeholder="Familiyasi" ></td>
-                <td><input type="text" name="group" class="form-control" placeholder="Guruhi" ></td>
-                <td><input type="text" name="course" class="form-control" placeholder="Kursi" ></td>
-                <td><input type="text" name="books" class="form-control" placeholder="Olgan kitoblari" ></td>
+                <td><input type="text" name="id" class="form-control search-input" placeholder="Id" ></td>
+                <td><input type="text" name="first_name" class="form-control search-input" placeholder="Ismi" ></td>
+                <td><input type="text" name="last_name" class="form-control search-input" placeholder="Familiyasi" ></td>
+                <td><input type="text" name="group" class="form-control search-input" placeholder="Guruhi" ></td>
+                <td><input type="text" name="course" class="form-control search-input" placeholder="Kursi" ></td>
+                <td><input type="text" name="books" class="form-control search-input" placeholder="Olgan kitoblari" ></td>
                 <td></td>
             </tr>
-{% for pupil in object_list %}
-    {% if pupil.books %}
-    <tr>
-        <td style="text-align: center;"><a href="{% url 'pupil_detail' pupil.pk %}">{{ pupil.id }}</a></td>
-        <td>{{ pupil.first_name }}</td>
-        <td>{{ pupil.last_name }}</td>
-        <td>{{ pupil.group }}</td>
-        <td>{{ pupil.course }}</td>
-        <td>{{ pupil.books }}</td>
-        <td>
-            <!-- Modalni ochish tugmasi -->
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bookModal{{ pupil.pk }}" style="width: 200px;">
-                Qabul qilish
-            </button>
-        </td>
-    </tr>
+        </thead>
 
-    <!-- Modal oyna -->
-    <div class="modal fade" id="bookModal{{ pupil.pk }}" tabindex="-1" aria-labelledby="bookModalLabel{{ pupil.pk }}" aria-hidden="true">
+        <tbody>
+            {% for pupil in object_list %}
+            {% if pupil.books %}
+            <tr>
+                <td style="text-align: center;"><a href="{% url 'pupil_detail' pupil.pk %}">{{ pupil.id }}</a></td>
+                <td>{{ pupil.first_name }}</td>
+                <td>{{ pupil.last_name }}</td>
+                <td>{{ pupil.group }}</td>
+                <td>{{ pupil.course }}</td>
+                <td>{{ pupil.books }}</td>
+                <td>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bookModal{{ pupil.pk }}" style="width: 200px;">
+                        Qabul qilish
+                    </button>
+                </td>
+            </tr>
 
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="bookModalLabel{{ pupil.pk }}"><strong>{{ pupil.last_name }} {{ pupil.first_name }} </strong> uchun kitoblar</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form method="post" action="{% url 'select_book' pupil.pk %}">
-                        {% csrf_token %}
-                        <p>Tanlang:</p>
-                        {% for book in pupil.books %}
-                            <div class="form-check" style="margin-bottom: 15px;">
-                                <input class="form-check-input" type="checkbox" name="selected_books[]" id="book{{ pupil.pk }}{{ forloop.counter }}" value="{{ book }}" style="font-size: 20px;">
-                                <label class="form-check-label" for="book{{ pupil.pk }}{{ forloop.counter }}" style="font-size: 20px;">
-                                    {{ book }}
-                                </label>
+        <div class="modal fade" id="bookModal{{ pupil.pk }}" tabindex="-1" aria-labelledby="bookModalLabel{{ pupil.pk }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="bookModalLabel{{ pupil.pk }}">
+                            <strong>{{ pupil.last_name }} {{ pupil.first_name }}</strong> uchun kitoblar
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" action="{% url 'select_book' pupil.pk %}">
+                            {% csrf_token %}
+                            <p>Tanlang:</p>
+                            {% for book in pupil.books %}
+                                <div class="form-check" style="margin-bottom: 15px;">
+                                    <input class="form-check-input" type="checkbox" name="selected_books[]" id="book{{ pupil.pk }}{{ forloop.counter }}" value="{{ book }}" style="font-size: 20px;">
+                                    <label class="form-check-label" for="book{{ pupil.pk }}{{ forloop.counter }}" style="font-size: 20px;">
+                                        {{ book }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                                <button type="submit" class="btn btn-success" onclick="alert('Kitob qabul qilindi!')">Tasdiqlash</button>
                             </div>
-                        {% endfor %}
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor qilish</button>
-                            <button type="submit" class="btn btn-success" onclick="alert('Kitob qabul qilindi!')">Tasdiqlash</button>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    {% endif %}
-{% endfor %}
-
-        </thead>
-
+            {% endif%}
+            {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center">Hech qanday natija topilmadi</td>
+                </tr>
+            {% endfor %}
+    </tbody>
     </table>
 </form>
 
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function()
+{
+    $(".search-input").on("keyup", function()
+    {
+        let formData = $("#search-form").serialize();
+        $.ajax(
+        {
+            url: "{% url 'take_book' %}",
+            type: "GET",
+            data: formData,
+            success: function(data)
+            {
+                $("tbody").html($(data).find("tbody").html());
+            }
+        });
+    });
+});
+</script>
 
 {% endblock %}

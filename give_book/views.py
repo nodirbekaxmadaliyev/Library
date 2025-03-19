@@ -8,6 +8,40 @@ class HomePageView(ListView):
     model = Book
     template_name = 'give_book/home.html'
 
+    def get_queryset(self):
+        queryset = Book.objects.all()
+
+        # Qidiruv parametrlari
+        code_q = self.request.GET.get("code", "").strip()
+        name_q = self.request.GET.get("name", "").strip()
+        author_q = self.request.GET.get("author", "").strip()
+        year_q = self.request.GET.get("year", "").strip()
+        language_q = self.request.GET.get("language", "").strip()
+        number_q = self.request.GET.get("number", "").strip()
+
+        # Filtr qo‘llash
+        if code_q:
+            queryset = queryset.filter(book_code__icontains=code_q)
+        if name_q:
+            queryset = queryset.filter(name__icontains=name_q)
+        if author_q:
+            queryset = queryset.filter(authors__icontains=author_q)
+        if year_q:
+            queryset = queryset.filter(year__icontains=year_q)
+        if language_q:
+            queryset = queryset.filter(book_lang__icontains=language_q)
+        if number_q:
+            queryset = queryset.filter(number__icontains=number_q)
+
+        return queryset
+
+    def render_to_response(self, context, **response_kwargs):
+        # AJAX so‘rov bo‘lsa, faqat jadvalni qaytarish
+        if self.request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return render(self.request, "give_book/home.html", context)
+        return super().render_to_response(context, **response_kwargs)
+
+
 def search_pupil(request, pk):
     if request.method == "POST":
         pupil_id = request.POST.get('pupil_id')

@@ -7,11 +7,38 @@ import pandas as pd
 # Create your views here.
 
 class PupilsListView(ListView, FormView):
-    model = Pupil  # ListView uchun model
+    model = Pupil
     template_name = "pupil/pupils.html"
 
     form_class = ExcelUploadForm  # Fayl yuklash formasi
-    success_url = reverse_lazy("pupils")  # Fayl yuklanganidan keyin qaytish yo‘li
+    success_url = reverse_lazy("pupils")
+
+    def get_queryset(self):
+        queryset = Pupil.objects.all()
+
+        # Qidiruv parametrlari
+        id_q = self.request.GET.get("id", "").strip()
+        first_name_q = self.request.GET.get("first_name", "").strip()
+        last_name_q = self.request.GET.get("last_name", "").strip()
+        group_q = self.request.GET.get("group", "").strip()
+        course_q = self.request.GET.get("course", "").strip()
+        books_q = self.request.GET.get("books", "").strip()
+
+        # Filtr qo‘llash
+        if id_q:
+            queryset = queryset.filter(id__icontains=id_q)
+        if first_name_q:
+            queryset = queryset.filter(first_name__icontains=first_name_q)
+        if last_name_q:
+            queryset = queryset.filter(last_name__icontains=last_name_q)
+        if group_q:
+            queryset = queryset.filter(group__icontains=group_q)
+        if course_q:
+            queryset = queryset.filter(course__icontains=course_q)
+        if books_q:
+            queryset = queryset.filter(books__icontains=books_q)
+
+        return queryset
 
     def form_valid(self, form):
         message = None
@@ -28,14 +55,20 @@ class PupilsListView(ListView, FormView):
                 )
 
             message = "Fayl muvaffaqiyatli yuklandi!"
-        except:
-            message = f"Xatolik yuz berdi. Excel faylni tekshirib ko`ring."
+        except Exception as e:
+            message = f"Xatolik yuz berdi. Excel faylni tekshirib ko‘ring. ({str(e)})"
 
         return render(self.request, self.template_name, {
             "form": form,
             "students": Pupil.objects.all(),
             "message": message
         })
+
+    def render_to_response(self, context, **response_kwargs):
+        # AJAX so‘rov bo‘lsa, faqat jadvalni qaytarish
+        if self.request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return render(self.request, "pupil/pupils.html", context)
+        return super().render_to_response(context, **response_kwargs)
 
 
 class PupilCreateView(CreateView):
