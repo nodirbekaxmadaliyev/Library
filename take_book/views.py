@@ -44,9 +44,10 @@ def select_book(request, pk):
         selected_books = request.POST.getlist('selected_books[]')
         pupil = Pupil.objects.get(pk=pk)
         for sbook in selected_books:
-            pupil.books.remove(sbook)
             book = Book.objects.filter(name=sbook).first()
-            book.number += 1
-            book.save()
+            if book:
+                pupil.books.remove(sbook)
+                book.number += 1
+                book.save()
         pupil.save()
         return redirect('take_book')
