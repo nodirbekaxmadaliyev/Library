@@ -34,6 +34,7 @@ class HomePageView(ListView):
 
         return queryset
 
+
     def render_to_response(self, context, **response_kwargs):
         if self.request.headers.get("X-Requested-With") == "XMLHttpRequest":
             return render(self.request, "take_book/home.html", context)
