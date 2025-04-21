@@ -12,6 +12,7 @@ class HomePageView(ListView):
         queryset = Book.objects.all()
 
         # Qidiruv parametrlari
+        id_q = self.request.GET.get("book_id", "").strip()
         code_q = self.request.GET.get("code", "").strip()
         name_q = self.request.GET.get("name", "").strip()
         author_q = self.request.GET.get("author", "").strip()
@@ -20,6 +21,8 @@ class HomePageView(ListView):
         number_q = self.request.GET.get("number", "").strip()
 
         # Filtr qo‘llash
+        if id_q:
+            queryset = queryset.filter(book_id__icontains=id_q)
         if code_q:
             queryset = queryset.filter(book_code__icontains=code_q)
         if name_q:
@@ -45,20 +48,28 @@ class HomePageView(ListView):
 def search_pupil(request, pk):
     if request.method == "POST":
         pupil_id = request.POST.get('pupil_id')
-        pupil = Pupil.objects.get(id=pupil_id)
-        book = Book.objects.get(pk=pk)
-        pupil.books.append(book.name)
-        book.number -= 1
-        book.save()
-        pupil.save()
-        return redirect('give_book')
+        pupil = get_object_or_404(Pupil, id=pupil_id)
+        book = get_object_or_404(Book, pk=pk)
+
+        # Tekshiramiz, kitob allaqachon mavjud emasmi?
+        if book.name not in pupil.books:
+            new_books = pupil.books.copy()  # JSONField must be reassigned
+            new_books.append(book.name)
+            pupil.books = new_books
+            pupil.save()
+
+            if book.number > 0:
+                book.number -= 1
+                book.save()
+
+        return redirect('give_book')  # Sahifani yangilaydi
 
 
 def check_pupil(request, pupil_id):
     from django.http import JsonResponse
     try:
         pupil = Pupil.objects.get(id=pupil_id)
-        return JsonResponse({"exists": True, "first_name": f"{pupil.last_name} {pupil.first_name}"})
+        return JsonResponse({"exists": True, "first_name": pupil.first_name})
     except Pupil.DoesNotExist:
         return JsonResponse({"exists": False})
 

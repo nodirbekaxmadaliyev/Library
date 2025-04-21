@@ -40,9 +40,9 @@ class HomePageView(ListView):
         return super().render_to_response(context, **response_kwargs)
 
 
-def select_book(request, pk):
+def select_book(request, pk1):
         selected_books = request.POST.getlist('selected_books[]')
-        pupil = Pupil.objects.get(pk=pk)
+        pupil = Pupil.objects.get(pk=pk1)
         for sbook in selected_books:
             pupil.books.remove(sbook)
             book = Book.objects.filter(name=sbook).first()

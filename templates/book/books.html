@@ -14,6 +14,7 @@
     <table class="table">
         <thead>
             <tr>
+                <th>Kitob id</th>
                 <th>Kitob kodi</th>
                 <th>Nomi</th>
                 <th>Yozuvchilari</th>
@@ -22,19 +23,21 @@
                 <th>Soni</th>
             </tr>
             <tr>
-                <td><input type="text" name="code" class="form-control search-input" placeholder="Code" ></td>
-                <td><input  type="text" name="name" class="form-control search-input" placeholder="Name" ></td>
-                <td><input type="text" name="author" class="form-control search-input" placeholder="Author" ></td>
-                <td><input type="text" name="year" class="form-control search-input" placeholder="Year" ></td>
-                <td><input type="text" name="language" class="form-control search-input" placeholder="Language" ></td>
-                <td><input type="text" name="number" class="form-control search-input" placeholder="Number" ></td>
+                <td><input type="number" name="book_id"  class="form-control search-input" placeholder="ID" ></td>
+                <td><input type="text"   name="code"     class="form-control search-input" placeholder="Kod" ></td>
+                <td><input  type="text"  name="name"     class="form-control search-input" placeholder="Nomi" ></td>
+                <td><input type="text"   name="author"   class="form-control search-input" placeholder="Yozuvchi" ></td>
+                <td><input type="text"   name="year"     class="form-control search-input" placeholder="Yili" ></td>
+                <td><input type="text"   name="language" class="form-control search-input" placeholder="Tili" ></td>
+                <td><input type="number" name="number"   class="form-control search-input" placeholder="Soni" ></td>
             </tr>
         </thead>
         <tbody>
             {% for book in object_list %}
             <tr>
-                <td style="text-align: center;">{{ book.book_code }}</td>
-                <td><a href="{% url 'book_detail' book.pk %}" style="text-decoration: none; color: #00008B;"><strong>{{ book.name }}</strong></a></td>
+                <td><a href="{% url 'book_detail' book.pk %}" style="text-decoration: none; color: #00008B;"><strong>{{ book.book_id }}</strong></a></td>
+                <td>{{ book.book_code }}</td>
+                <td><strong>{{ book.name }}</strong></td>
                 <td>{{ book.authors }}</td>
                 <td>{{ book.year }}</td>
                 <td>{{ book.book_lang }}</td>
@@ -42,7 +45,7 @@
             </tr>
             {% empty %}
                 <tr>
-                    <td colspan="6" class="text-center">Hech qanday natija topilmadi</td>
+                    <td colspan="7" class="text-center">Hech qanday natija topilmadi</td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -93,10 +96,11 @@ $(document).ready(function() {
         let formData = $("#search-form").serialize(); // Inputdagi barcha qiymatlarni olish
 
         $.ajax({
-            url: "{% url 'books' %}", // URL to'g'riligini tekshiring!
+            url: "{% url 'books' %}",
             type: "GET",
             data: formData,
-            success: function(data) {
+            success: function(data)
+            {
                 $("tbody").html($(data).find("tbody").html()); // Jadvalni yangilash
             },
             error: function(xhr, status, error) {

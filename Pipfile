@@ -5,8 +5,8 @@ name = "pypi"
 
 [packages]
 django = "~=5.1.6"
-pandas = "*"
 openpyxl = "*"
+pandas = "*"
 
 [dev-packages]
 
