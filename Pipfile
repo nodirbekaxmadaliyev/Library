@@ -7,6 +7,11 @@ name = "pypi"
 django = "~=5.1.6"
 openpyxl = "*"
 pandas = "*"
+opencv-contrib-python = "*"
+pillow = "*"
+opencv-python = "*"
+opencv-python-headless = "*"
+numpy = "*"
 
 [dev-packages]
 

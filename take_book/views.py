@@ -1,9 +1,13 @@
 from django.views.generic import ListView
-from pupils.models import Pupil
-from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from books.models import Book
-from django.contrib import messages
+import base64
+import cv2
+import numpy as np
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from pupils.models import Pupil
+import json
 
 # Create your views here.
 class HomePageView(ListView):
@@ -51,3 +55,32 @@ def select_book(request, pk1):
             book.save()
         pupil.save()
         return redirect('take_book')
+
+@csrf_exempt
+def face_match_api(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        img_data = data.get('image', '').split(',')[1]
+        img_bytes = base64.b64decode(img_data)
+        np_arr = np.frombuffer(img_bytes, np.uint8)
+        img = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
+
+        face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+        faces = face_cascade.detectMultiScale(img, 1.1, 5)
+
+        if len(faces) == 0:
+            return JsonResponse({'success': False})
+
+        (x, y, w, h) = faces[0]
+        face_roi = img[y:y + h, x:x + w]
+        face_roi = cv2.resize(face_roi, (100, 100))
+
+        for pupil in Pupil.objects.exclude(face_encoding=None):
+            stored_encoding = np.frombuffer(pupil.face_encoding, dtype=np.uint8)
+            stored_encoding = stored_encoding.reshape(100, 100)
+            diff = cv2.absdiff(stored_encoding, face_roi)
+            similarity = 1 - (np.sum(diff) / (100 * 100 * 255))
+            if similarity > 0.5:
+                return JsonResponse({'success': True, 'pupil_id': pupil.pk})
+        return JsonResponse({'success': False})
+    return JsonResponse({'success': False})

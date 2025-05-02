@@ -15,7 +15,4 @@ urlpatterns = [
     path('pupils/', include('pupils.urls')),
     path('take_book/', include('take_book.urls')),
     path('give_book/', include('give_book.urls')),
-    path('api/check_pupil/<int:pupil_id>/', views.check_pupil, name='check_pupil'),
-]
-
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

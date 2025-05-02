@@ -1,35 +1,111 @@
 {% extends 'base.html' %}
 {% block content %}
-<form id="search-form">
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Ismi</th>
-                <th>Familiyasi</th>
-                <th>Guruhi</th>
-                <th>Kursi</th>
-                <th>Olgan kitoblari</th>
-            </tr>
-            <tr>
-                <td style="text-align: center;">{{ pupil.id }}</td>
-                <td>{{ pupil.first_name }}</td>
-                <td>{{ pupil.last_name }}</td>
-                <td>{{ pupil.group }}</td>
-                <td>{{ pupil.course }}</td>
-                <td>{{ pupil.books }}</td>
-            </tr>
-        </thead>
-    </table>
-</form>
-<div class="d-flex justify-content-center mt-4 gap-3">
-    <a href="{% url 'pupils' %}" class="btn btn-secondary">Ortga</a>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <!-- Talaba rasmi uchun qism -->
+                <div class="text-center mt-3">
+                    {% if pupil.face_image %}
+                        <img src="{{ pupil.face_image.url }}" alt="{{ pupil.first_name }} {{ pupil.last_name }}"
+                             class="rounded-circle border" width="200" height="200" style="object-fit: cover;">
+                    {% else %}
+                        <div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center"
+                             style="width: 200px; height: 200px;">
+                            <span class="text-white fs-1">{{ pupil.first_name|first }}{{ pupil.last_name|first }}</span>
+                        </div>
+                    {% endif %}
+                </div>
 
-    <a href="{% url 'pupil_update' pupil.pk %}" class="btn btn-warning">Tahrirlash</a>
+                <!-- Talaba ma'lumotlari -->
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <h5 class="text-muted mb-1">ID</h5>
+                                <p class="fs-5">{{ pupil.id }}</p>
+                            </div>
 
-    <form action="{% url 'pupil_delete' pupil.pk %}" method="post" style="display: inline;">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger" onclick="return confirm('Talabani o\'chirishga ishonchingiz komilmi?')">O'chirish</button>
-    </form>
+                            <div class="mb-3">
+                                <h5 class="text-muted mb-1">Ismi</h5>
+                                <p class="fs-5">{{ pupil.first_name }}</p>
+                            </div>
+
+                            <div class="mb-3">
+                                <h5 class="text-muted mb-1">Familiyasi</h5>
+                                <p class="fs-5">{{ pupil.last_name }}</p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <h5 class="text-muted mb-1">Guruhi</h5>
+                                <p class="fs-5">{{ pupil.group }}</p>
+                            </div>
+
+                            <div class="mb-3">
+                                <h5 class="text-muted mb-1">Kursi</h5>
+                                <p class="fs-5">{{ pupil.course }}</p>
+                            </div>
+
+                            <div class="mb-3">
+                                <h5 class="text-muted mb-1">Olgan kitoblari</h5>
+                                {% if pupil.books %}
+                                    <ul class="list-unstyled">
+                                        {% for book in pupil.books %}
+                                            <li class="fs-5">{{ book }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p class="fs-5 text-muted">Kitoblar yo'q</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tugmalar -->
+                <div class="card-footer bg-white border-0">
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'pupils' %}" class="btn btn-secondary px-4">
+                            <i class="bi bi-arrow-left me-2"></i> Ortga
+                        </a>
+
+                        <a href="{% url 'pupil_update' pupil.pk %}" class="btn btn-warning px-4">
+                            <i class="bi bi-pencil me-2"></i> Tahrirlash
+                        </a>
+
+                        <form action="{% url 'pupil_delete' pupil.pk %}" method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger px-4"
+                                    onclick="return confirm('Talabani o\'chirishga ishonchingiz komilmi?')">
+                                <i class="bi bi-trash me-2"></i> O'chirish
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-{% endblock content %}
+
+<!-- Bootstrap Icons uchun -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+<style>
+    .card {
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    .card-body {
+        padding: 2rem;
+    }
+    .card-footer {
+        padding-bottom: 2rem;
+    }
+    .rounded-circle {
+        border: 5px solid #f8f9fa;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+</style>
+{% endblock %}

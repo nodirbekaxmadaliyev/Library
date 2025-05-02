@@ -1,46 +1,207 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container mt-5">
-        <div class="row justify-content-center" >
-            <div class="col-md-6" style="width:800px;">
-                <div class="card shadow-lg p-4">
-                    <h2 class="mb-4">Yangi talaba qo'shish</h2>
-    <div class="card">
-        <div class="card-body">
-            <form method="post" class="container mt-4">
-    {% csrf_token %}
-    <div class="d-grid gap-3">
-        <div>
-            <label for="id_first_name" class="form-label">Ismi</label>
-            {{ form.first_name }}
-        </div>
+    <div class="row justify-content-center">
+        <div class="col-md-6" style="width:800px;">
+            <div class="card shadow-lg p-4">
+                <h2 class="mb-4">Yangi talaba qo'shish</h2>
+                <div class="card">
+                    <div class="card-body">
+                        <form method="post" class="container mt-4" enctype="multipart/form-data" id="pupil-form">
+                            {% csrf_token %}
+                            <div class="d-grid gap-3">
+                                <div>
+                                    <label for="id_first_name" class="form-label">Ismi</label>
+                                    <input type="text" name="first_name" id="id_first_name" class="form-control" required>
+                                </div>
 
-        <div>
-            <label for="id_last_name" class="form-label">Familiyasi</label>
-            {{ form.last_name }}
-        </div>
+                                <div>
+                                    <label for="id_last_name" class="form-label">Familiyasi</label>
+                                    <input type="text" name="last_name" id="id_last_name" class="form-control" required>
+                                </div>
 
-        <div>
-            <label for="id_group" class="form-label">Guruhi</label>
-            {{ form.group }}
-        </div>
+                                <div>
+                                    <label for="id_group" class="form-label">Guruhi</label>
+                                    <input type="text" name="group" id="id_group" class="form-control" required>
+                                </div>
 
-        <div>
-            <label for="id_course" class="form-label">Kursi</label>
-            {{ form.course }}
-        </div>
+                                <div>
+                                    <label for="id_course" class="form-label">Kursi</label>
+                                    <input type="number" name="course" id="id_course" class="form-control" min="1" max="8">
+                                </div>
 
-        <div>
-            <button type="submit" class="btn btn-primary">Saqlash</button>
-        </div>
-    </div>
-</form>
+                                <!-- Yuzni yuklash uchun qism -->
+                                <div class="mb-3">
+                                    <label class="form-label">Yuz rasmi</label>
+                                    <div id="camera-container" class="mb-2 border rounded overflow-hidden">
+                                        <video id="video" width="100%" autoplay playsinline></video>
+                                        <canvas id="canvas" style="display:none;"></canvas>
+                                    </div>
+                                    <button type="button" id="capture" class="btn btn-outline-primary mb-2">Rasmga olish</button>
+                                    <div id="face-result" class="alert" style="display:none;"></div>
+                                    <input type="hidden" name="face_image" id="face-image-data">
+                                </div>
 
-        </div>
-    </div>
-    <a href="{% url 'pupils' %}" class="btn btn-secondary mt-3">Orqaga qaytish</a>
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary" id="submit-btn">Saqlash</button>
+                                    <a href="{% url 'pupils' %}" class="btn btn-secondary">Orqaga qaytish</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
 </div>
-{% endblock content %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const captureBtn = document.getElementById('capture');
+    const faceResult = document.getElementById('face-result');
+    const faceImageData = document.getElementById('face-image-data');
+    const form = document.getElementById('pupil-form');
+    const submitBtn = document.getElementById('submit-btn');
+    let stream = null;
+
+    // Xabarlarni ko'rsatish funksiyasi
+    function showAlert(message, type) {
+        faceResult.textContent = message;
+        faceResult.className = `alert alert-${type}`;
+        faceResult.style.display = 'block';
+    }
+
+    // Kamerani ishga tushirish
+    async function startCamera() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: { width: 640, height: 480 },
+                audio: false
+            });
+            video.srcObject = stream;
+            video.play();
+        } catch (err) {
+            console.error("Kamera xatosi:", err);
+            showAlert("Kameraga kirishda xatolik!", 'danger');
+        }
+    }
+
+    // Rasmga olish
+    captureBtn.addEventListener('click', function() {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const imageData = canvas.toDataURL('image/jpeg', 0.8);
+        faceImageData.value = imageData;
+
+        showAlert("Rasm muvaffaqiyatli olingan!", 'success');
+    });
+
+    // Formani yuborish
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        try {
+        const response = await fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            window.location.href = data.redirect;
+        } else {
+            // Xatoliklarni ko'rsatish
+            if (data.errors && data.errors.face_image) {
+                showAlert(data.errors.face_image[0].message, 'danger');
+            } else {
+                showAlert("Saqlashda xatolik!", 'danger');
+            }
+        }
+    } catch (error) {
+        console.error('Xato:', error);
+        showAlert("Server xatosi!", 'danger');
+    }
+        if (!faceImageData.value) {
+            showAlert("Iltimos, yuzingizni rasmga oling!", 'warning');
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Saqlanmoqda...
+        `;
+
+        try {
+            // 1. Avval yuzni tanib olishga urinamiz
+            showAlert("Yuzni tekshirilmoqda...", 'info');
+
+            const recognizeResponse = await fetch("{% url 'recognize_face' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ image: faceImageData.value })
+            });
+
+            const recognizeData = await recognizeResponse.json();
+
+            // 2. Agar yuz topilsa, foydalanuvchi ma'lumotlarini ko'rsatamiz
+            if (recognizeData.success && recognizeData.pupil) {
+                showAlert(`Bu foydalanuvchi allaqachon mavjud: ${recognizeData.pupil.first_name} ${recognizeData.pupil.last_name}`, 'warning');
+                document.getElementById('id_first_name').value = recognizeData.pupil.first_name;
+                document.getElementById('id_last_name').value = recognizeData.pupil.last_name;
+                document.getElementById('id_group').value = recognizeData.pupil.group;
+                document.getElementById('id_course').value = recognizeData.pupil.course;
+            }
+            // 3. Agar yuz topilmasa, yangi foydalanuvchini saqlaymiz
+            else {
+                // Base64 ni FormData ga qo'shish
+                const blob = await (await fetch(faceImageData.value)).blob();
+                const formData = new FormData(form);
+                formData.set('face_image', blob, 'face.jpg');
+
+                const saveResponse = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                });
+
+                if (saveResponse.ok) {
+                    window.location.href = "{% url 'pupils' %}";
+                } else {
+                    const saveData = await saveResponse.json();
+                    showAlert(saveData.message || "Saqlashda xatolik!", 'danger');
+                }
+            }
+        } catch (error) {
+            console.error('Xato:', error);
+            showAlert("Server xatosi!", 'danger');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Saqlash';
+        }
+    });
+
+    // Sahifa yuklanganda kamerani ishga tushirish
+    startCamera();
+
+    // Sahifa yopilganda kamerani to'xtatish
+    window.addEventListener('beforeunload', function() {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
+    });
+});
+</script>
+{% endblock %}
