@@ -187,7 +187,7 @@ def recognize_face(request):
                     difference = cv2.absdiff(stored_encoding, face_roi)
                     similarity = 1 - (np.sum(difference) / (100 * 100 * 255))
 
-                    if similarity > 0.7:
+                    if similarity > 0.5:
                         return JsonResponse({
                             'success': True,
                             'pupil': {

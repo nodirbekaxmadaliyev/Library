@@ -78,7 +78,7 @@ class Pupil(models.Model):
                     difference = cv2.absdiff(stored_encoding, face_roi)
                     similarity = 1 - (np.sum(difference) / (100 * 100 * 255))
 
-                    if similarity > 0.5:  # 80% o'xshashlik
+                    if similarity > 0.5 :  # 80% o'xshashlik
                         raise ValidationError(
                             {'face_image': 'Bu yuz allaqachon bazada mavjud. Foydalanuvchi: %s %s' % (
                                 pupil.first_name, pupil.last_name
@@ -90,7 +90,7 @@ class Pupil(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
-        if self.face_image and not self.face_encoding:
+        if self.face_image:
             try:
                 img_path = self.face_image.path
                 image = cv2.imread(img_path)
@@ -102,10 +102,16 @@ class Pupil(models.Model):
 
                     if len(faces) > 0:
                         (x, y, w, h) = faces[0]
-                        face_roi = gray[y:y + h, x:x + w]
-                        face_roi = cv2.resize(face_roi, (100, 100))
-                        self.face_encoding = face_roi.tobytes()
+                        face_roi_color = image[y:y + h, x:x + w]
+                        face_roi_gray = cv2.cvtColor(face_roi_color, cv2.COLOR_BGR2GRAY)
+                        face_roi_resized = cv2.resize(face_roi_gray, (100, 100))
+                        self.face_encoding = face_roi_resized.tobytes()
+
+                        # Kesilgan yuzni original fayl o‘rniga saqlash
+                        cv2.imwrite(img_path, face_roi_color)
+
                         super().save(update_fields=['face_encoding'])
+
             except Exception as e:
                 print(f"Yuz kodlashda xato: {e}")
 

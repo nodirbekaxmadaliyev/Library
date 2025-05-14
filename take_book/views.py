@@ -45,9 +45,9 @@ class HomePageView(ListView):
         return super().render_to_response(context, **response_kwargs)
 
 
-def select_book(request, pk1):
+def select_book(request, pk):
         selected_books = request.POST.getlist('selected_books[]')
-        pupil = Pupil.objects.get(pk=pk1)
+        pupil = Pupil.objects.get(pk=pk)
         for sbook in selected_books:
             pupil.books.remove(sbook)
             book = Book.objects.filter(name=sbook).first()
@@ -80,7 +80,7 @@ def face_match_api(request):
             stored_encoding = stored_encoding.reshape(100, 100)
             diff = cv2.absdiff(stored_encoding, face_roi)
             similarity = 1 - (np.sum(diff) / (100 * 100 * 255))
-            if similarity > 0.5:
+            if similarity > 0.85:
                 return JsonResponse({'success': True, 'pupil_id': pupil.pk})
         return JsonResponse({'success': False})
     return JsonResponse({'success': False})

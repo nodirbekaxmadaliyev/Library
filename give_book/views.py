@@ -74,7 +74,7 @@ def recognize_face(request):
             data = json.loads(request.body)
             image_data = data.get('image', '').split(',')[1]
 
-            # Rasmni qayta ishlash
+            # Rasmni dekodlash
             image_bytes = base64.b64decode(image_data)
             nparr = np.frombuffer(image_bytes, np.uint8)
             image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
@@ -89,18 +89,17 @@ def recognize_face(request):
 
             (x, y, w, h) = faces[0]
             face_roi = gray[y:y + h, x:x + w]
-            face_roi = cv2.resize(face_roi, (100, 100))
+            face_roi = cv2.resize(face_roi, (100, 100)).astype(np.uint8)
 
-            # Bazadagi talabalarni solishtirish
+            # Bazadagi yuzlar bilan solishtirish
             for pupil in Pupil.objects.all():
                 if pupil.face_encoding:
-                    stored_encoding = np.frombuffer(pupil.face_encoding, dtype=np.uint8)
-                    stored_encoding = stored_encoding.reshape(100, 100)
+                    stored_encoding = np.frombuffer(pupil.face_encoding, dtype=np.uint8).reshape(100, 100)
 
                     difference = cv2.absdiff(stored_encoding, face_roi)
                     similarity = 1 - (np.sum(difference) / (100 * 100 * 255))
 
-                    if similarity > 0.9:
+                    if similarity > 0.8:
                         return JsonResponse({
                             'success': True,
                             'pupil': {
